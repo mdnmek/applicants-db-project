@@ -28,10 +28,28 @@ ROUND(AVG(es.result),1) AS Среднее FROM subject s
 JOIN enrollee_subject es
 ON s.subject_id = es.subject_id
 GROUP BY s.name_subject
-ORDER BY s.name_subject
+ORDER BY s.name_subject;
 
+-- вывести образовательные программы, для которых минимальный балл 
+-- ЕГЭ по каждому предмету больше или равен 40 баллам
 
+SELECT p.name_program FROM program p
+JOIN program_subject ps
+ON ps.program_id = p.program_id
+GROUP BY p.name_program
+HAVING MIN(min_result)>=40
+ORDER BY p.name_program;
 
+-- вывести образовательные программы, которые имеют самый большой план набора
+SELECT name_program, plan FROM program
+ORDER BY plan DESC LIMIT 1;
 
-
-
+-- посчитать, сколько дополнительных баллов получит каждый абитуриент
+SELECT e.name_enrollee, COALESCE(SUM(a.bonus), 0) AS Бонус 
+FROM enrollee e
+LEFT JOIN enrollee_achievement ea
+ON e.enrollee_id = ea.enrollee_id
+LEFT JOIN achievement a
+ON a.achievement_id = ea.achievement_id
+GROUP BY e.enrollee_id, e.name_enrollee
+ORDER BY e.name_enrollee;
